@@ -35,7 +35,7 @@ export const fetchPuzzle = async ({
 
         const [puzzle, solution] = generatePuzzle(difficulty);
 
-        console.log(solution);
+        // console.log(solution);
 
         setPuzzle(puzzle);
         // setPuzzle(solution); // For Testing
@@ -181,8 +181,6 @@ const generatePuzzle = (difficulty) => {
             puzzle[r][c] = val; // Put the number back
         }
     }
-
-    console.log(emptyCount);
 
     return [puzzle, solution];
 };
