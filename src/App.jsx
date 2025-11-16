@@ -3,8 +3,10 @@ import './App.css'
 import Grid from './components/Grid';
 import Controls from './components/Controls';
 import { fetchPuzzle } from './fetch-puzzle';
+import Difficulty from './components/Difficulty';
 
 function App() {
+    // For Testing
     // const [board, setBoard] = useState(Array(9).fill(null).map(() => Array(9).fill(null)));
     // const [puzzle, setPuzzle] = useState(Array(9).fill(null).map(() => Array(9).fill(null)));
     // const [solution, setSolution] = useState(Array(9).fill(null).map(() => Array(9).fill(null)));
@@ -14,17 +16,19 @@ function App() {
     const [solution, setSolution] = useState(null);
 
     useEffect(() => {
-        resetBoard();
-    }, [])
+        resetBoard(difficulty);
+    }, []);
 
     const [selected, setSelected] = useState(null); //[row, col]
+    const [selectedVal, setSelectedVal] = useState(null);
     const [status, setStatus] = useState("");
     const [error, setError] = useState("");
+    const [difficulty, setDifficulty] = useState("MEDIUM"); // Default diffculty MEDIUM
 
     const [greenCount, setGreenCount] = useState(0);
 
-    const resetBoard = () => {
-        fetchPuzzle({setError, setStatus, setPuzzle, setSolution, setBoard, setSelected});
+    const resetBoard = (diff) => {
+        fetchPuzzle({setError, setStatus, setPuzzle, setSolution, setBoard, setSelected, difficulty: diff});
     };
 
     const handleInput = (rIdx, cIdx, value) => {
@@ -33,7 +37,11 @@ function App() {
                 prev.map((row, r) => 
                     row.map((cell, c) => {
                         if (r === rIdx && c === cIdx) {
-                            return value ? parseInt(value) : null;
+                            const newCellVal = value ? parseInt(value) : null
+                            if (newCellVal) {
+                                setSelectedCell([r, c], newCellVal)
+                            }
+                            return newCellVal;
                         }
 
                         return cell;
@@ -68,14 +76,19 @@ function App() {
         setBoard(puzzle.map((row) => [...row]));
         setStatus("");
         setSelected(null);
+        setSelectedVal(null);
         setGreenCount(0);
     };
 
-    const handleNewPuzzle = () => {
-        // Status and selected handled inside resetBoard
-        setGreenCount(0);
-        resetBoard();
-    };
+    const handleDiffcultyChange = (newDiff) => {
+        setDifficulty(newDiff);
+        resetBoard(newDiff);
+    }
+
+    const setSelectedCell = (cellPos, val) => {
+        setSelected(cellPos);
+        setSelectedVal(val);
+    }
 
     if (error) {
         return <div style={{color: "red"}}>{error}</div>;
@@ -89,14 +102,24 @@ function App() {
     return (
         <div style={{textAlign: 'center'}}>
             <h1>Sudoku</h1>
+            <p className="difficulty-label">{difficulty}</p>
             <Grid 
                 board={board} 
                 puzzle={puzzle} 
                 handleInput={handleInput}
                 selected={selected} 
-                setSelected={setSelected}
-                greenCount={greenCount} />
-            <Controls handleCheck={handleCheck} handleReset={handleReset} handleNewPuzzle={handleNewPuzzle} />
+                setSelectedCell={setSelectedCell}
+                greenCount={greenCount}
+                selectedVal={selectedVal} />
+            <Controls handleCheck={handleCheck} handleReset={handleReset} />
+            <section style={{ marginTop: "5px", textAlign: "center" }}>
+                <h3>New Puzzle:</h3>
+                <Difficulty 
+                    easyOnClick={() => handleDiffcultyChange("EASY")}
+                    mediumOnClick={() => handleDiffcultyChange("MEDIUM")}
+                    hardOnClick={() => handleDiffcultyChange("HARD")}
+                />
+            </section>
             {status && <div className="status">{status}</div>}
         </div>
     );

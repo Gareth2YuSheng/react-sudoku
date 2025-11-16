@@ -1,6 +1,6 @@
 import classNames from "classnames";
 
-const Grid = ({board, puzzle, handleInput, selected, setSelected, greenCount}) => {
+const Grid = ({board, puzzle, handleInput, selected, greenCount, selectedVal, setSelectedCell}) => {
 
     return (
         <div className="container">
@@ -20,18 +20,26 @@ const Grid = ({board, puzzle, handleInput, selected, setSelected, greenCount}) =
                                             "same-box": selected &&
                                                         Math.floor(rIdx/3) === Math.floor(selected[0]/3) &&
                                                         Math.floor(cIdx/3) === Math.floor(selected[1]/3),
-                                            "green": cellIndex < greenCount
+                                            "green": cellIndex < greenCount,
+                                            "same-value-cell": selected && cell && cell === selectedVal
                                         }
                                     )}>
                                         <input
+                                            className={
+                                                classNames({
+                                                    "prefilled-cell": isPrefilled,
+                                                    "empty-cell": !isPrefilled
+                                                })
+                                            }
                                             type="text"
                                             maxLength={1}
                                             value={cell == null ? "" : cell}
                                             readOnly={isPrefilled}
-                                            onFocus={() => {setSelected([rIdx, cIdx])}}
-                                            onClick={() => {setSelected([rIdx, cIdx])}}
+                                            onFocus={() => {setSelectedCell([rIdx, cIdx], cell)}}
+                                            onClick={() => {setSelectedCell([rIdx, cIdx], cell)}}
                                             onChange={(e) => {
-                                                handleInput(rIdx, cIdx, e.target.value)
+                                                console.log(e.target.value);
+                                                handleInput(rIdx, cIdx, e.target.value);
                                             }}
                                         />
                                     </td>
